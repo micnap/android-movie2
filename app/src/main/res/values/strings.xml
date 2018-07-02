@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Pop Movies 2</string>
+    <string name="detail_name">MovieDetail</string>
+    <string name="error_message">A network error has occurred.</string>
+    <string name="movie_title">Movie title</string>
+    <string name="popular">Popular</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="rating">%1$s /10</string>
+</resources>
