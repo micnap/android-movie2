@@ -1,4 +1,4 @@
-package com.mickeywilliamson.mickey.popularmovies;
+package com.mickeywilliamson.mickey.popularmovies2;
 
 import org.junit.Test;
 

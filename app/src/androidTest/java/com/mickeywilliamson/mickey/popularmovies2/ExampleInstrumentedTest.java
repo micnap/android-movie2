@@ -1,4 +1,4 @@
-package com.mickeywilliamson.mickey.popularmovies;
+package com.mickeywilliamson.mickey.popularmovies2;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
