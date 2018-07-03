@@ -8,27 +8,25 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Displays details of a single movie.
  */
 public class DetailActivity extends AppCompatActivity {
 
-    private TextView mTitle;
-    private ImageView mImage;
-    private TextView mPlot;
-    private TextView mRating;
-    private TextView mReleaseDate;
+    @BindView(R.id.tv_title) TextView mTitle;
+    @BindView(R.id.tv_image) ImageView mImage;
+    @BindView(R.id.tv_plot) TextView mPlot;
+    @BindView(R.id.tv_rating) TextView mRating;
+    @BindView(R.id.tv_release_date) TextView mReleaseDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
-        mTitle = (TextView) findViewById(R.id.tv_title);
-        mImage = (ImageView) findViewById(R.id.tv_image);
-        mPlot = (TextView) findViewById(R.id.tv_plot);
-        mRating = (TextView) findViewById(R.id.tv_rating);
-        mReleaseDate = (TextView) findViewById(R.id.tv_release_date);
+        ButterKnife.bind(this);
 
         // Get the movie data passed in from the Main screen and display it.
         Intent intent = getIntent();

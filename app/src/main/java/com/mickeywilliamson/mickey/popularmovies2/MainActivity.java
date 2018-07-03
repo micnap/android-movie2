@@ -16,21 +16,24 @@ import android.widget.TextView;
 import java.net.URL;
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
 
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.rv_movie_list) RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
-    private TextView mErrorMessage;
-    private ProgressBar mLoader;
+
+    @BindView(R.id.tv_error_message) TextView mErrorMessage;
+
+    @BindView(R.id.pb_loader) ProgressBar mLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_list);
-        mErrorMessage = (TextView) findViewById(R.id.tv_error_message);
-        mLoader = (ProgressBar) findViewById(R.id.pb_loader);
+        ButterKnife.bind(this);
 
         // Create the grid view.
         GridLayoutManager lm = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
