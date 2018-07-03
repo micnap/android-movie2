@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.mickeywilliamson.mickey.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -59,7 +58,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         // Create the view's image path and load the image with Picasso.
         String image_path = getImagePath(currentMovie.getImage(), WIDTH_W500);
-        Picasso.with(holder.mImage.getContext()).load(image_path).into(holder.mImage);
+        Picasso.with(holder.mImage.getContext()).load(image_path).placeholder(R.drawable.default_movie).error(R.drawable.default_movie).into(holder.mImage);
         holder.mImage.setContentDescription(currentMovie.getTitle());
     }
 

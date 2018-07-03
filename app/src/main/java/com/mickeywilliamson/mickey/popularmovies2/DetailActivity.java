@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mickeywilliamson.mickey.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -36,7 +35,7 @@ public class DetailActivity extends AppCompatActivity {
         if (intent.hasExtra("movie")) {
             Movie movie = intent.getParcelableExtra("movie");
             mTitle.setText(movie.getTitle());
-            Picasso.with(this).load(MovieAdapter.getImagePath(movie.getImage(), MovieAdapter.WIDTH_W342)).into(mImage);
+            Picasso.with(this).load(MovieAdapter.getImagePath(movie.getImage(), MovieAdapter.WIDTH_W342)).placeholder(R.drawable.default_movie).error(R.drawable.default_movie).into(mImage);
             mImage.setContentDescription(movie.getTitle());
             mPlot.setText(movie.getPlot());
             String ratingText = getString(R.string.rating, movie.getRating());
