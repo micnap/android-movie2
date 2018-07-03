@@ -1,8 +1,13 @@
 package com.mickeywilliamson.mickey.popularmovies2;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,29 +21,48 @@ import butterknife.ButterKnife;
  */
 public class DetailActivity extends AppCompatActivity {
 
-    @BindView(R.id.tv_title) TextView mTitle;
-    @BindView(R.id.tv_image) ImageView mImage;
-    @BindView(R.id.tv_plot) TextView mPlot;
-    @BindView(R.id.tv_rating) TextView mRating;
-    @BindView(R.id.tv_release_date) TextView mReleaseDate;
+    @BindView(R.id.navigation) BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
         ButterKnife.bind(this);
 
         // Get the movie data passed in from the Main screen and display it.
-        Intent intent = getIntent();
-        if (intent.hasExtra("movie")) {
-            Movie movie = intent.getParcelableExtra("movie");
-            mTitle.setText(movie.getTitle());
-            Picasso.with(this).load(MovieAdapter.getImagePath(movie.getImage(), MovieAdapter.WIDTH_W342)).placeholder(R.drawable.default_movie).error(R.drawable.default_movie).into(mImage);
-            mImage.setContentDescription(movie.getTitle());
-            mPlot.setText(movie.getPlot());
-            String ratingText = getString(R.string.rating, movie.getRating());
-            mRating.setText(ratingText);
-            mReleaseDate.setText(MovieAdapter.getYear(movie.getReleaseDate()));
-        }
+        final Intent intent = getIntent();
+        final Movie movie = intent.getParcelableExtra("movie");
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+
+                Fragment selectedFragment = null;
+
+                switch (item.getItemId()) {
+                    case R.id.bottom_nav_detail_data:
+                        selectedFragment = DetailMain.newInstance(movie);
+                        break;
+                    case R.id.bottom_nav_detail_trailers:
+                        selectedFragment = DetailTrailers.newInstance();
+                        break;
+                    case R.id.bottom_nav_detail_reviews:
+                        selectedFragment = DetailReviews.newInstance();
+                        break;
+                }
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.frame_layout, selectedFragment);
+                transaction.commit();
+                return true;
+            }
+        });
+
+        // Manually displaying the first fragment.
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frame_layout, DetailMain.newInstance(movie));
+        transaction.commit();
+
     }
 }

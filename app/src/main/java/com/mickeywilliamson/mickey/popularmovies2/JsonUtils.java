@@ -14,6 +14,7 @@ final class JsonUtils {
     public static ArrayList<Movie> parseMoviesFromJSON(String moviesJsonString) throws JSONException {
 
         // The movie fields we're interested in.
+        final String FIELD_ID = "id";
         final String FIELD_TITLE = "title";
         final String FIELD_IMAGE = "poster_path";
         final String FIELD_PLOT = "overview";
@@ -32,6 +33,7 @@ final class JsonUtils {
         // Extract the movie data and store it in the arraylist.
         for (int i = 0; i < results.length(); i++) {
             Movie movie = new Movie();
+            movie.setId(results.getJSONObject(i).getString(FIELD_ID));
             movie.setTitle(results.getJSONObject(i).getString(FIELD_TITLE));
             movie.setImage(results.getJSONObject(i).getString(FIELD_IMAGE));
             movie.setPlot(results.getJSONObject(i).getString(FIELD_PLOT));

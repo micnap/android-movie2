@@ -9,6 +9,7 @@ import android.os.Parcelable;
 public class Movie implements Parcelable {
 
     // Movie properties.
+    private String id;
     private String title;
     private String image;
     private String plot;
@@ -27,6 +28,10 @@ public class Movie implements Parcelable {
     }
 
     // Setters and getters.
+    public void setId(String id) { this.id = id; }
+
+    public String getId() { return id; }
+
     public void setTitle(String title) {
         this.title = title;
     }
