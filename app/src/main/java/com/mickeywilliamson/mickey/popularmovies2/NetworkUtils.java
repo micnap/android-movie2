@@ -28,10 +28,10 @@ class NetworkUtils {
      *
      * @return The URL to use to query the weather server.
      */
-    public static URL buildUrl(Context context, String sort) {
+    public static URL buildUrl(Context context, String path) {
 
         Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                .appendPath(sort)
+                .appendEncodedPath(path)
                 .appendQueryParameter(PARAM_API_KEY, MovieGlobals.getKey(context))
                 .build();
 

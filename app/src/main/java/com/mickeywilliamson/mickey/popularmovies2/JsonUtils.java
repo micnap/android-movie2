@@ -1,5 +1,7 @@
 package com.mickeywilliamson.mickey.popularmovies2;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,7 +9,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Utility class for parsing the JSON response from the Movie API.
+ * Utility class for parsing the JSON responses from the Movie API.
  */
 final class JsonUtils {
 
@@ -43,5 +45,61 @@ final class JsonUtils {
         }
 
         return movies;
+    }
+
+    public static ArrayList<Review> parseReviewsFromJSON(String reviewsJsonString) throws JSONException {
+
+        Log.d("RESULTS", reviewsJsonString);
+
+        // The review fields we're interested in.
+        final String FIELD_AUTHOR = "author";
+        final String FIELD_REVIEW = "content";
+
+        // The parsed reviews will be stored in an ArrayList.
+        ArrayList<Review> reviews = new ArrayList<>();
+
+        // Create a JSON object from the JSON string returned by the API.
+        JSONObject reviewsJson = new JSONObject(reviewsJsonString);
+
+        // The movies are housed in the "results" portion of the response.
+        JSONArray results = reviewsJson.getJSONArray("results");
+
+        for (int i = 0; i < results.length(); i++) {
+            Review review = new Review();
+
+            review.setAuthor(results.getJSONObject(i).getString(FIELD_AUTHOR));
+            review.setReview(results.getJSONObject(i).getString(FIELD_REVIEW));
+            reviews.add(review);
+        }
+        Log.d("COUNT", String.valueOf(reviews.size()));
+        return reviews;
+    }
+
+    public static ArrayList<Trailer> parseTrailersFromJSON(String trailersJsonString) throws JSONException {
+
+        Log.d("RESULTS", trailersJsonString);
+
+        // The review fields we're interested in.
+        final String FIELD_TITLE = "name";
+        final String FIELD_VIDEO_ID = "key";
+
+        // The parsed reviews will be stored in an ArrayList.
+        ArrayList<Trailer> trailers = new ArrayList<>();
+
+        // Create a JSON object from the JSON string returned by the API.
+        JSONObject trailersJson = new JSONObject(trailersJsonString);
+
+        // The movies are housed in the "results" portion of the response.
+        JSONArray results = trailersJson.getJSONArray("results");
+
+        for (int i = 0; i < results.length(); i++) {
+            Trailer trailer = new Trailer();
+
+            trailer.setTitle(results.getJSONObject(i).getString(FIELD_TITLE));
+            trailer.setVideoID(results.getJSONObject(i).getString(FIELD_VIDEO_ID));
+            trailers.add(trailer);
+        }
+        Log.d("TRAILER COUNT", String.valueOf(results.length()));
+        return trailers;
     }
 }

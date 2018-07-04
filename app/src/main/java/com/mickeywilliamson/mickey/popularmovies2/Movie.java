@@ -20,6 +20,7 @@ public class Movie implements Parcelable {
     Movie() {}
 
     private Movie(Parcel in) {
+        this.id = in.readString();
         this.title = in.readString();
         this.image = in.readString();
         this.plot = in.readString();
@@ -92,6 +93,7 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeString(title);
         dest.writeString(image);
         dest.writeString(plot);

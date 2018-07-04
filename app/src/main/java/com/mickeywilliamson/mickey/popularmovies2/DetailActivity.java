@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ public class DetailActivity extends AppCompatActivity {
         // Get the movie data passed in from the Main screen and display it.
         final Intent intent = getIntent();
         final Movie movie = intent.getParcelableExtra("movie");
+        Log.d("TESTTEST", movie.getId());
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -46,10 +48,10 @@ public class DetailActivity extends AppCompatActivity {
                         selectedFragment = DetailMain.newInstance(movie);
                         break;
                     case R.id.bottom_nav_detail_trailers:
-                        selectedFragment = DetailTrailers.newInstance();
+                        selectedFragment = DetailTrailers.newInstance(movie.getId());
                         break;
                     case R.id.bottom_nav_detail_reviews:
-                        selectedFragment = DetailReviews.newInstance();
+                        selectedFragment = DetailReviews.newInstance(movie.getId());
                         break;
                 }
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -64,5 +66,18 @@ public class DetailActivity extends AppCompatActivity {
         transaction.replace(R.id.frame_layout, DetailMain.newInstance(movie));
         transaction.commit();
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putInt("SelectedItemId", bottomNavigationView.getSelectedItemId());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        int selectedItemId = savedInstanceState.getInt("SelectedItemId");
+        bottomNavigationView.setSelectedItemId(selectedItemId);
     }
 }
