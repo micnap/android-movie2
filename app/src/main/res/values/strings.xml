@@ -12,6 +12,7 @@
     <string name="button_favorite">Mark as favorite</string>
     <string name="favorite_movies">Favorite Movies</string>
     <string name="in_favorites">In Favorites</string>
+    <string name="no_favorited_movies">No movies in favorites list.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment1">Hello blank fragment 1</string>

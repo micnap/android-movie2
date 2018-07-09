@@ -26,7 +26,7 @@ import butterknife.OnClick;
  */
 public class DetailMain extends Fragment {
 
-    // Binds views to variables using ButterKnife library.
+    // Binds views to variables.
     @BindView(R.id.tv_title) TextView mTitle;
     @BindView(R.id.tv_image) ImageView mImage;
     @BindView(R.id.tv_plot) TextView mPlot;
@@ -129,5 +129,6 @@ public class DetailMain extends Fragment {
         });
 
         Toast.makeText(getActivity(), "Added to Favorites", Toast.LENGTH_SHORT).show();
+
     }
 }

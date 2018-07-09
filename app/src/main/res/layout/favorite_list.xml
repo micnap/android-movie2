@@ -9,7 +9,6 @@
     android:layout_margin="4dp"
     android:background="@android:color/white">
 
-
     <TextView
         android:id="@+id/tv_movie_title"
         android:layout_width="match_parent"

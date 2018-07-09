@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -43,6 +44,9 @@ public class FavoriteMoviesActivity extends AppCompatActivity implements Favorit
         mFavoriteList.setLayoutManager(new LinearLayoutManager(this));
         mFavoriteAdapter = new FavoriteAdapter(this, this);
         mFavoriteList.setAdapter(mFavoriteAdapter);
+
+        mErrorMessage.setVisibility(View.INVISIBLE);
+        mFavoriteList.setVisibility(View.VISIBLE);
         mDb = AppDatabase.getInstance(getApplicationContext());
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -76,7 +80,14 @@ public class FavoriteMoviesActivity extends AppCompatActivity implements Favorit
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
 
-                mFavoriteAdapter.setFavoriteMovies(movies);
+                if (movies.size() > 0) {
+                    mFavoriteList.setVisibility(View.VISIBLE);
+                    mFavoriteAdapter.setFavoriteMovies(movies);
+                    mErrorMessage.setVisibility(View.INVISIBLE);
+
+                } else {
+                    showErrorMessage(getString(R.string.no_favorited_movies));
+                }
             }
         });
     }
@@ -87,5 +98,16 @@ public class FavoriteMoviesActivity extends AppCompatActivity implements Favorit
         Intent intent = new Intent(FavoriteMoviesActivity.this, DetailActivity.class);
         intent.putExtra("movie", movie);
         startActivity(intent);
+    }
+
+    /**
+     * Utility method to hide the recycler view and display an error if we can't get the data.
+     */
+    private void showErrorMessage(String message) {
+        mFavoriteList.setVisibility(View.INVISIBLE);
+        if (message != null) {
+            mErrorMessage.setText(message);
+        }
+        mErrorMessage.setVisibility(View.VISIBLE);
     }
 }

@@ -68,7 +68,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
 
-        getSupportLoaderManager().initLoader(MOVIES_LOADER, bundle, this);
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<String> movieReviewsLoader = loaderManager.getLoader(MOVIES_LOADER);
+        if (movieReviewsLoader == null) {
+            loaderManager.initLoader(MOVIES_LOADER, bundle, this);
+        } else {
+            loaderManager.restartLoader(MOVIES_LOADER, bundle, this);
+        }
     }
 
     /**
