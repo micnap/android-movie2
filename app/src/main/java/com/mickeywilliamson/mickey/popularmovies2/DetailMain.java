@@ -97,7 +97,7 @@ public class DetailMain extends Fragment {
                 @Override
                 public void onChanged(@Nullable Movie movie) {
                     if (movie != null) {
-                        btnFavorite.setText(getString(R.string.in_favorites));
+                        btnFavorite.setText(btnFavorite.getResources().getString(R.string.in_favorites));
                         btnFavorite.setEnabled(false);
                     }
                 }
