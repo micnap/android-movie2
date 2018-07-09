@@ -18,6 +18,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
 
     private ArrayList<Review> reviews;
 
+    // Constructor.
     public ReviewAdapter() {}
 
     @NonNull

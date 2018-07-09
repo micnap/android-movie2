@@ -9,19 +9,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Displays details of a single movie.
+ * Base activity for displaying details of a movie which includes a separate screen for data,
+ * trailers, and reviews.
  */
 public class DetailActivity extends AppCompatActivity {
 
+    // Movie details screen is comprised of 3 fragments - details, trailers, and reviews.
+    // BottomNavigationView is used to navigate between the three fragments.
     @BindView(R.id.navigation) BottomNavigationView bottomNavigationView;
 
     @Override
@@ -31,15 +30,15 @@ public class DetailActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        // Get the movie data passed in from the Main screen and display it.
+        // Get the movie data passed in from the Main screen as an intent and display it.
         final Intent intent = getIntent();
         final Movie movie = intent.getParcelableExtra("movie");
-        Log.d("TESTTEST", movie.getId());
 
+        // Choose what fragment to display based on which tab in the BottomNavigationView that
+        // was clicked on.
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
 
                 Fragment selectedFragment = null;
 
@@ -48,10 +47,10 @@ public class DetailActivity extends AppCompatActivity {
                         selectedFragment = DetailMain.newInstance(movie);
                         break;
                     case R.id.bottom_nav_detail_trailers:
-                        selectedFragment = DetailTrailers.newInstance(movie.getId());
+                        selectedFragment = DetailTrailers.newInstance(movie);
                         break;
                     case R.id.bottom_nav_detail_reviews:
-                        selectedFragment = DetailReviews.newInstance(movie.getId());
+                        selectedFragment = DetailReviews.newInstance(movie);
                         break;
                 }
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -61,19 +60,20 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-        // Manually displaying the first fragment.
+        // Manually display the main details fragment on first visit to the activity.
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_layout, DetailMain.newInstance(movie));
         transaction.commit();
-
     }
 
+    // Needed to maintain selected BottomNavigationView item across rotation.
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putInt("SelectedItemId", bottomNavigationView.getSelectedItemId());
     }
 
+    // Needed to maintain selected BottomNavigationView item across rotation.
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);

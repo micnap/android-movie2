@@ -1,10 +1,15 @@
 package com.mickeywilliamson.mickey.popularmovies2;
 
+/**
+ * Trailers POJO class.
+ */
 public class Trailer {
 
+    // Trailer properties.
     private String title;
     private String video_id;
 
+    // Constructors.
     public Trailer() {}
 
     public Trailer(String title, String video_id) {
@@ -12,6 +17,7 @@ public class Trailer {
         this.video_id = video_id;
     }
 
+    // Setters and getters.
     public void setTitle(String title) {
         this.title = title;
     }

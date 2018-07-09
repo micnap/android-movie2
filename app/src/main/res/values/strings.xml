@@ -5,8 +5,13 @@
     <string name="movie_title">Movie title</string>
     <string name="popular">Popular</string>
     <string name="top_rated">Top Rated</string>
+    <string name="favorites">Favorites</string>
     <string name="rating">%1$s /10</string>
-    <string name="empty">This movie has no reviews.</string>
+    <string name="empty_reviews">This movie has no reviews.</string>
+    <string name="empty_trailers">This movie has no trailers.</string>
+    <string name="button_favorite">Mark as favorite</string>
+    <string name="favorite_movies">Favorite Movies</string>
+    <string name="in_favorites">In Favorites</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment1">Hello blank fragment 1</string>

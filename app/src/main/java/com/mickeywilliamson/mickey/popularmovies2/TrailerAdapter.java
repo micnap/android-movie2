@@ -21,6 +21,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
     private ArrayList<Trailer> trailers;
     private final ListItemClickListener mOnClickListener;
 
+    // Constructor.
     public TrailerAdapter(ListItemClickListener listener) {mOnClickListener = listener;}
 
     @NonNull
@@ -57,14 +58,14 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
     public class TrailerAdapterViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
 
         @BindView(R.id.trailer_title) TextView mTitle;
+        @BindView(R.id.play_video) ImageButton mPlayVideo;
 
         public TrailerAdapterViewHolder(View itemView) {
             super(itemView);
 
-            // No idea why I can't use ButterKnife to bind the view.  When I try, it tells me that mPlayVideo is null.
-            ImageButton mPlayVideo = (ImageButton) itemView.findViewById(R.id.play_video);
-            mPlayVideo.setOnClickListener(this);
             ButterKnife.bind(this, itemView);
+
+            mPlayVideo.setOnClickListener(this);
         }
 
         @Override

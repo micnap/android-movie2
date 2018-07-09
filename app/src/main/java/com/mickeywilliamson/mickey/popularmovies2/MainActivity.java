@@ -2,6 +2,11 @@ package com.mickeywilliamson.mickey.popularmovies2;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,14 +24,16 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener, LoaderManager.LoaderCallbacks<ArrayList<Movie>> {
 
+    // Uses ButterKnife annotations to bind views to variables.
     @BindView(R.id.rv_movie_list) RecyclerView mRecyclerView;
+    @BindView(R.id.tv_error_message) TextView mErrorMessage;
+    @BindView(R.id.pb_loader) ProgressBar mLoader;
+
     private MovieAdapter mMovieAdapter;
 
-    @BindView(R.id.tv_error_message) TextView mErrorMessage;
-
-    @BindView(R.id.pb_loader) ProgressBar mLoader;
+    private static final int MOVIES_LOADER = 2450;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,20 +51,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mRecyclerView.setAdapter(mMovieAdapter);
 
         // Load the movie data.
-        loadMovies();
+        String sort = MovieGlobals.SORT != null ? MovieGlobals.SORT : MovieAdapter.SORT_POPULAR;
+        Bundle bundle = new Bundle();
+        bundle.putString("sort", sort);
+        loadMovies(bundle);
     }
 
     /**
      * Loads the movie data in a background thread.
+     *
+     * @param bundle Bundle
+     *        bundle holds the Sort that movies should be shown in (most popular or top rated).
      */
-    private void loadMovies() {
+    protected void loadMovies(Bundle bundle) {
+
         mErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
 
-        // The parameter of the execute method determines the sort (popular/top rated) that is to be
-        // displayed. If no sort has been previously set, retrieve the movies sorted by popular.
-        // Otherwise, show the sort previously chosen.
-        new MovieAsyncTask().execute(MovieGlobals.SORT != null ? MovieGlobals.SORT : MovieAdapter.SORT_POPULAR);
+        getSupportLoaderManager().initLoader(MOVIES_LOADER, bundle, this);
     }
 
     /**
@@ -68,6 +79,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mErrorMessage.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Opens the detail view of the movie that was clicked on.
+     *
+     * @param clickedMovie Movie
+     *      The movie object the user clicked on in the list.
+     */
     @Override
     public void onListItemClick(Movie clickedMovie) {
 
@@ -77,58 +94,81 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         startActivity(intent);
     }
 
-    /**
-     * Retrieves the movie data from the appropriate endpoint
-     */
-    class MovieAsyncTask extends AsyncTask<String, Void, ArrayList<Movie>> {
+    // Movies are retrieved on a background thread.
+    @NonNull
+    @Override
+    public Loader<ArrayList<Movie>> onCreateLoader(int id, @Nullable final Bundle args) {
+        return new AsyncTaskLoader<ArrayList<Movie>>(this) {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+            ArrayList<Movie> mMovies;
 
-            // Shows an animated loader icon while the data is loading.
-            mLoader.setVisibility(View.VISIBLE);
-        }
+            @Override
+            protected void onStartLoading() {
+                if (args == null) {
+                    return;
+                }
+                mLoader.setVisibility(View.VISIBLE);
 
-        @Override
-        protected ArrayList<Movie> doInBackground(String... strings) {
-
-            ArrayList<Movie> movies;
-
-            // The string that determines the endpoint from which to get the movie data.
-            String sort = strings[0];
-
-            // Build the endpoint url.
-            URL url = NetworkUtils.buildUrl(MainActivity.this, sort);
-
-            // Attempt to get the movie data and parse it.
-            try {
-                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(url);
-
-                movies = JsonUtils.parseMoviesFromJSON(jsonResponse);
-
-                return movies;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+                // If results are cached, return those.  Otherwie, fetch new results.
+                if (mMovies != null) {
+                    deliverResult(mMovies);
+                } else {
+                    forceLoad();
+                }
             }
-        }
 
-        @Override
-        protected void onPostExecute(ArrayList<Movie> movies) {
+            @Nullable
+            @Override
+            public ArrayList<Movie> loadInBackground() {
 
-            // if we successfully retrieved the movie data, hide the loader icon and display the movies.
-            // Otherwise, display the error.
-            mLoader.setVisibility(View.INVISIBLE);
-            if (movies != null) {
-                mErrorMessage.setVisibility(View.INVISIBLE);
-                mRecyclerView.setVisibility(View.VISIBLE);
-                mMovieAdapter.setMovieData(movies);
-            } else {
-                showErrorMessage();
+                // The string that determines the endpoint from which to get the movie data.
+                String sort = args.getString("sort");
+
+                // Build the endpoint url.
+                URL url = NetworkUtils.buildUrl(MainActivity.this, sort);
+
+                // Attempt to get the movie data and parse it.
+                try {
+                    String jsonResponse = NetworkUtils.getResponseFromHttpUrl(url);
+
+                    mMovies = JsonUtils.parseMoviesFromJSON(jsonResponse);
+
+                    return mMovies;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
+
+            // Cache results.
+            @Override
+            public void deliverResult(ArrayList<Movie> movies) {
+                mMovies = movies;
+                super.deliverResult(movies);
+            }
+        };
+    }
+
+    // Movies have been retrieved.  And now we display them on the UI thread.
+    @Override
+    public void onLoadFinished(@NonNull Loader<ArrayList<Movie>> loader, ArrayList<Movie> data) {
+
+        // if we successfully retrieved the movie data, hide the loader icon and display the movies.
+        // Otherwise, display the error.
+        mLoader.setVisibility(View.INVISIBLE);
+        if (data != null) {
+            mErrorMessage.setVisibility(View.INVISIBLE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mMovieAdapter.setMovieData(data);
+        } else {
+            showErrorMessage();
         }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<ArrayList<Movie>> loader) {
+
     }
 
     @Override
@@ -154,6 +194,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             return chooseSort(MovieAdapter.SORT_TOP_RATED);
         }
 
+        if (id == R.id.sort_favorites) {
+            Intent intent = new Intent(this, FavoriteMoviesActivity.class);
+            startActivity(intent);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -165,9 +210,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
      * @return boolean
      *              Returns true
      */
-    private boolean chooseSort(String sort) {
+    public boolean chooseSort(String sort) {
         MovieGlobals.SORT = sort;
-        new MovieAsyncTask().execute(sort);
+        Bundle bundle = new Bundle();
+        bundle.putString("sort", sort);
+        loadMovies(bundle);
         return true;
     }
 }

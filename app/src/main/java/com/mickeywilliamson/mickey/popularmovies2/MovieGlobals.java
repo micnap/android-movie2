@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * Class used to persist data.
+ * Class used to persist SORT and to grab the API key.
+ * API key should be stored in a text file named "key.txt" in a folder named "assets".  "assets"
+ * folder should be at the same level as the java and res directories.
  */
 class MovieGlobals extends Application {
 

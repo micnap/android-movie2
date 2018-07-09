@@ -5,9 +5,12 @@ package com.mickeywilliamson.mickey.popularmovies2;
  */
 public class Review {
 
+    // Review properties.
     private String author;
     private String review;
 
+
+    // Constructors.
     public Review() {}
 
     public Review(String author, String review) {
@@ -15,6 +18,7 @@ public class Review {
         this.review = review;
     }
 
+    // Setters and getters.
     public void setAuthor(String author) {
         this.author = author;
     }

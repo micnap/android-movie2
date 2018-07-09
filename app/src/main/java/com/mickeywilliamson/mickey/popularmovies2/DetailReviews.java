@@ -1,16 +1,14 @@
 package com.mickeywilliamson.mickey.popularmovies2;
 
-import android.app.Activity;
-import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,24 +22,34 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**
+ * This class displays a movie's reviews as a fragment attached to the DetailActivity.
+ */
+public class DetailReviews extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<Review>> {
 
-public class DetailReviews extends Fragment {
-
+    // Binds views to variables using ButterKnife library.
     @BindView(R.id.rv_review_list) RecyclerView mReviewList;
     @BindView(R.id.tv_error_message) TextView mErrorMessage;
     @BindView(R.id.pb_loader) ProgressBar mLoader;
+    @BindView(R.id.tv_title) TextView mTitle;
+    @BindView(R.id.linearlayout) LinearLayout ll;
 
     private static final String PATH = "reviews";
     private static final String ARG_ID = "id";
+    private static final String ARG_TITLE = "title";
     private ReviewAdapter mReviewAdapter;
+
+    private static final int MOVIE_REVIEWS_LOADER = 2451;
 
     // Required empty public constructor
     public DetailReviews() {}
 
-    public static DetailReviews newInstance(String id) {
+    // Instantiates the fragment and extracts the id and title of the movie passed in.
+    public static DetailReviews newInstance(Movie movie) {
         DetailReviews fragment = new DetailReviews();
         Bundle args = new Bundle();
-        args.putString(ARG_ID, id);
+        args.putString(ARG_ID, movie.getId());
+        args.putString(ARG_TITLE, movie.getTitle());
         fragment.setArguments(args);
 
         return fragment;
@@ -58,25 +66,30 @@ public class DetailReviews extends Fragment {
 
         RecyclerView.LayoutManager lm = new LinearLayoutManager(getActivity().getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         mReviewList.setLayoutManager(lm);
-
-        mReviewAdapter = new ReviewAdapter();
-        mReviewList.setAdapter(mReviewAdapter);
     }
 
     /**
-     * Loads the movie data in a background thread.
+     * Loads the movie reviews in an asynctaskloader from the endpoint
+     * http://api.themoviedb.org/3/movie/[id]/reviews?api_key=[api_key] using the movie's id that
+     * was passed into the class.  The list of reviews retrieved is then cached.
      */
     private void loadReviews(String id) {
         mErrorMessage.setVisibility(View.INVISIBLE);
         mReviewList.setVisibility(View.VISIBLE);
 
-        // The parameter of the execute method determines the sort (popular/top rated) that is to be
-        // displayed. If no sort has been previously set, retrieve the movies sorted by popular.
-        // Otherwise, show the sort previously chosen.
+        mReviewAdapter = new ReviewAdapter();
+        mReviewList.setAdapter(mReviewAdapter);
 
+        Bundle bundle = new Bundle();
+        bundle.putString("id", id);
 
-        new ReviewAsyncTask().execute(id);
-
+        LoaderManager loaderManager = getActivity().getSupportLoaderManager();
+        Loader<String> movieReviewsLoader = loaderManager.getLoader(MOVIE_REVIEWS_LOADER);
+        if (movieReviewsLoader == null) {
+            loaderManager.initLoader(MOVIE_REVIEWS_LOADER, bundle, this);
+        } else {
+            loaderManager.restartLoader(MOVIE_REVIEWS_LOADER, bundle, this);
+        }
     }
 
     /**
@@ -90,6 +103,8 @@ public class DetailReviews extends Fragment {
         mErrorMessage.setVisibility(View.VISIBLE);
     }
 
+    // Binds the views used in the fragment, sets the movie's title for display and kicks off the
+    // retrieving of reviews.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,65 +115,103 @@ public class DetailReviews extends Fragment {
 
         if (getArguments() != null) {
             loadReviews(getArguments().getString(ARG_ID));
+            mTitle.setText(getArguments().getString(ARG_TITLE));
         }
 
         return view;
     }
 
-    /**
-     * Retrieves the movie data from the appropriate endpoint
-     */
-    class ReviewAsyncTask extends AsyncTask<String, Void, ArrayList<Review>> {
+    // Reviews are retrieved asynchronously.
+    @NonNull
+    @Override
+    public Loader<ArrayList<Review>> onCreateLoader(int id, @Nullable final Bundle args) {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        return new AsyncTaskLoader<ArrayList<Review>>(getActivity()) {
 
-            // Shows an animated loader icon while the data is loading.
-            mLoader.setVisibility(View.VISIBLE);
-        }
+            ArrayList<Review> mReviews;
 
-        @Override
-        protected ArrayList<Review> doInBackground(String... strings) {
+            @Override
+            protected void onStartLoading() {
+                if (args == null) {
+                    return;
+                }
 
-            ArrayList<Review> reviews;
+                mLoader.setVisibility(View.VISIBLE);
 
-            // The string that determines the endpoint from which to get the movie data.
-            String id = strings[0];
-
-            // Build the endpoint url.
-            URL url = NetworkUtils.buildUrl(getActivity(), id + "/" + PATH);
-
-            // Attempt to get the movie data and parse it.
-            try {
-                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(url);
-
-                reviews = JsonUtils.parseReviewsFromJSON(jsonResponse);
-
-                return reviews;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+                // If results are cached, return those.  Otherwie, fetch new results.
+                if (mReviews != null) {
+                    deliverResult(mReviews);
+                } else {
+                    forceLoad();
+                }
             }
-        }
 
-        @Override
-        protected void onPostExecute(ArrayList<Review> reviews) {
+            @Nullable
+            @Override
+            public ArrayList<Review> loadInBackground() {
 
-            // if we successfully retrieved the movie data, hide the loader icon and display the movies.
-            // Otherwise, display the error.
-            mLoader.setVisibility(View.INVISIBLE);
-            if (reviews.size() == 0) {
-                showErrorMessage(getString(R.string.empty));
-            } else if (reviews != null) {
-                mErrorMessage.setVisibility(View.INVISIBLE);
-                mReviewList.setVisibility(View.VISIBLE);
-                mReviewAdapter.setReviewData(reviews);
-            } else {
-                showErrorMessage(null);
+                // The string that determines the endpoint from which to get the movie data.
+                String id = args.getString("id");
+
+                // Build the endpoint url.
+                URL url = NetworkUtils.buildUrl(getActivity(), id + "/" + PATH);
+
+                // Attempt to get the movie data and parse it.
+                try {
+                    String jsonResponse = NetworkUtils.getResponseFromHttpUrl(url);
+
+                    mReviews = JsonUtils.parseReviewsFromJSON(jsonResponse);
+
+                    return mReviews;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
+
+            // Cache results.
+            @Override
+            public void deliverResult(ArrayList<Review> reviewList) {
+                mReviews = reviewList;
+                super.deliverResult(reviewList);
+            }
+        };
+    }
+
+    // Reviews have been retrieved.  And now we display them on the UI thread.
+    @Override
+    public void onLoadFinished(@NonNull Loader<ArrayList<Review>> loader, ArrayList<Review> data) {
+
+        // if we successfully retrieved the movie data, hide the loader icon and display the movies.
+        // Otherwise, display the error.
+        mLoader.setVisibility(View.INVISIBLE);
+
+        // A hack: Setting the loader to invisible (above) just hides it from view but doesn't remove
+        // the space it takes up in the UI.  This removes the space.
+        ll.removeView(mLoader);
+
+        // If data exists, hide the errormessage view and display the data.  Otherwise, show the error message.
+        if (data.size() == 0) {
+            showErrorMessage(getString(R.string.empty_reviews));
+        } else if (data != null) {
+            mErrorMessage.setVisibility(View.INVISIBLE);
+
+            // A hack: Setting the errormessage to invisible just hides it from view but doesn't remove
+            // the space it takes up in the UI.  This removes the space.
+            ll.removeView(mErrorMessage);
+
+            mReviewList.setVisibility(View.VISIBLE);
+
+            // Send the data to the recyclerview for display.
+            mReviewAdapter.setReviewData(data);
+        } else {
+            showErrorMessage(null);
         }
     }
 
+    @Override
+    public void onLoaderReset(@NonNull Loader<ArrayList<Review>> loader) {
+
+    }
 }

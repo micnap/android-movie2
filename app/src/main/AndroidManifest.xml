@@ -11,16 +11,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.mickeywilliamson.mickey.popularmovies2.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.mickeywilliamson.mickey.popularmovies2.DetailActivity"
-            android:parentActivityName="com.mickeywilliamson.mickey.popularmovies2.MainActivity"
-            android:label="@string/detail_name">
+        <activity
+            android:name=".DetailActivity"
+            android:label="@string/detail_name"
+            android:parentActivityName=".MainActivity">
+        </activity>
+        <activity android:name=".FavoriteMoviesActivity">
         </activity>
     </application>
 
