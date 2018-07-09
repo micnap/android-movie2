@@ -1,5 +1,7 @@
 ABOUT THIS APP - This Android app was created as an assignment for the Udacity-Google Android Development Nanodegree.  It utilizes the themoviedb.org's API to pull in movie data and display it in. The app consists of two screens that list movies according to the chosen sort (popular or top rated) and a screen that lists the user's favorite movies. A menu allows the user to switch between these three listing screens. If a user clicks on a movie in any of these list screens, they are taken to a screen the shows the movie's details.  The movie details are separated into 3 fragments - main details, reviews, and trailers - which the user can access via a menu at the bottom of the screen.  On the main details screen, the user can click a button to add the movie to their favorites list.
 
+The app uses both AsyncTaskLoaders to load the data from the endpoints and Room, LiveData and ViewModels for the Favorites functionality for learning purposes.  
+
 API KEY - The API key is not included in the app's repository.  The examples URLs used in this readme file will not work.  The user should generate a new API key (create an account with themoviedb.org and then visit the account area to generate a key) and save it in a single line in a text file named key.txt in a folder named assets at /app/src/main/assets/key.txt. It should sit alongside the java and res folders. The app will automatically grab the key from the file.
 
 Project Implementation Guide:
