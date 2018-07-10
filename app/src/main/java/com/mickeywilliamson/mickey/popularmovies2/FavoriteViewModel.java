@@ -8,8 +8,8 @@ import com.mickeywilliamson.mickey.popularmovies2.Database.AppDatabase;
 
 import java.util.List;
 
-public class FavoriteViewModel extends AndroidViewModel {
-    private LiveData<List<Movie>> favoriteMovies;
+class FavoriteViewModel extends AndroidViewModel {
+    private final LiveData<List<Movie>> favoriteMovies;
 
     public FavoriteViewModel(Application application) {
         super(application);

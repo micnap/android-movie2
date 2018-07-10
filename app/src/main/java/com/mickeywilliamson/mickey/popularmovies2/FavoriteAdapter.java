@@ -20,11 +20,9 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
     private List<Movie> mFavoriteMovies;
     final private ItemClickListener mItemClickListener;
-    private Context mContext;
 
     // Constructor.
-    public FavoriteAdapter(Context context, ItemClickListener listener) {
-        mContext = context;
+    public FavoriteAdapter(ItemClickListener listener) {
         mItemClickListener = listener;
     }
 
@@ -58,7 +56,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
         @BindView(R.id.tv_movie_title) TextView mTitle;
 
-        public FavoriteAdapterViewHolder(View itemView) {
+        FavoriteAdapterViewHolder(View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);

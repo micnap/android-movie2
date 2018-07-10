@@ -36,7 +36,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
         final Review currentReview = reviews.get(position);
 
         holder.mReview.setText(currentReview.getReview());
-        holder.mAuthor.setText("- " + currentReview.getAuthor());
+        holder.mAuthor.setText(holder.itemView.getResources().getString(R.string.author, currentReview.getAuthor()));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
         @BindView(R.id.author) TextView mAuthor;
         @BindView(R.id.review) TextView mReview;
 
-        public ReviewAdapterViewHolder(View itemView) {
+        ReviewAdapterViewHolder(View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);

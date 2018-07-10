@@ -56,11 +56,6 @@ public class DetailReviews extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -138,7 +133,7 @@ public class DetailReviews extends Fragment implements LoaderManager.LoaderCallb
 
                 mLoader.setVisibility(View.VISIBLE);
 
-                // If results are cached, return those.  Otherwie, fetch new results.
+                // If results are cached, return those.  Otherwise, fetch new results.
                 if (mReviews != null) {
                     deliverResult(mReviews);
                 } else {

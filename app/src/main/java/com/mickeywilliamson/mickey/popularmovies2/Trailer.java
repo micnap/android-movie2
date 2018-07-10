@@ -3,7 +3,7 @@ package com.mickeywilliamson.mickey.popularmovies2;
 /**
  * Trailers POJO class.
  */
-public class Trailer {
+class Trailer {
 
     // Trailer properties.
     private String title;

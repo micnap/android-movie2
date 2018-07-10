@@ -9,10 +9,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -42,7 +38,7 @@ public class FavoriteMoviesActivity extends AppCompatActivity implements Favorit
         setTitle(getString(R.string.favorite_movies));
 
         mFavoriteList.setLayoutManager(new LinearLayoutManager(this));
-        mFavoriteAdapter = new FavoriteAdapter(this, this);
+        mFavoriteAdapter = new FavoriteAdapter(this);
         mFavoriteList.setAdapter(mFavoriteAdapter);
 
         mErrorMessage.setVisibility(View.INVISIBLE);

@@ -65,10 +65,6 @@ public class DetailMain extends Fragment {
         return fragment;
     }
 
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     // Sets the views' values from the data passed into the fragment.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -129,6 +125,5 @@ public class DetailMain extends Fragment {
         });
 
         Toast.makeText(getActivity(), "Added to Favorites", Toast.LENGTH_SHORT).show();
-
     }
 }

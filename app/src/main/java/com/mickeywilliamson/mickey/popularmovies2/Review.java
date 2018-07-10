@@ -3,7 +3,7 @@ package com.mickeywilliamson.mickey.popularmovies2;
 /**
  * Reviews POJO class.
  */
-public class Review {
+class Review {
 
     // Review properties.
     private String author;

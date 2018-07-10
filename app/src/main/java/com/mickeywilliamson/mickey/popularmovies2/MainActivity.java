@@ -1,7 +1,6 @@
 package com.mickeywilliamson.mickey.popularmovies2;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
      * @param bundle Bundle
      *        bundle holds the Sort that movies should be shown in (most popular or top rated).
      */
-    protected void loadMovies(Bundle bundle) {
+    private void loadMovies(Bundle bundle) {
 
         mErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 }
                 mLoader.setVisibility(View.VISIBLE);
 
-                // If results are cached, return those.  Otherwie, fetch new results.
+                // If results are cached, return those.  Otherwise, fetch new results.
                 if (mMovies != null) {
                     deliverResult(mMovies);
                 } else {
@@ -216,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
      * @return boolean
      *              Returns true
      */
-    public boolean chooseSort(String sort) {
+    private boolean chooseSort(String sort) {
         MovieGlobals.SORT = sort;
         Bundle bundle = new Bundle();
         bundle.putString("sort", sort);
