@@ -1,6 +1,8 @@
 package com.mickeywilliamson.mickey.popularmovies2;
 
 import android.content.Intent;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -31,7 +33,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @BindView(R.id.pb_loader) ProgressBar mLoader;
 
     private MovieAdapter mMovieAdapter;
+    private Parcelable mSavedRecyclerLayoutState;
+    private GridLayoutManager lm;
+    private boolean newSort = false;
 
+    private static final String BUNDLE_RECYCLER_LAYOUT = "recycler_layout";
     private static final int MOVIES_LOADER = 2450;
 
     @Override
@@ -42,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         ButterKnife.bind(this);
 
         // Create the grid view.
-        GridLayoutManager lm = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        lm = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(lm);
 
         // Attach the data to the grid.
@@ -162,10 +168,23 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         // if we successfully retrieved the movie data, hide the loader icon and display the movies.
         // Otherwise, display the error.
         mLoader.setVisibility(View.INVISIBLE);
+
         if (data != null) {
             mErrorMessage.setVisibility(View.INVISIBLE);
             mRecyclerView.setVisibility(View.VISIBLE);
+
+            // If the user has chosen a different sort, display the list from the top.
+            // Otherwise, keep the position on rotation.
+            if (newSort) {
+                mRecyclerView.scrollToPosition(0);
+                newSort = false;
+            } else {
+                if (mSavedRecyclerLayoutState != null) {
+                    lm.onRestoreInstanceState(mSavedRecyclerLayoutState);
+                }
+            }
             mMovieAdapter.setMovieData(data);
+
         } else {
             showErrorMessage();
         }
@@ -191,11 +210,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         // If the "popular" sort is chosen, persist the choice and display the appropriate movies.
         if (id == R.id.sort_popular) {
+            newSort = true;
             return chooseSort(MovieAdapter.SORT_POPULAR);
         }
 
         // If the "top rated" sort is chosen, persist the choice and display the appropriate movies.
         if (id == R.id.sort_top_rated) {
+            newSort = true;
             return chooseSort(MovieAdapter.SORT_TOP_RATED);
         }
 
@@ -221,5 +242,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         bundle.putString("sort", sort);
         loadMovies(bundle);
         return true;
+    }
+
+    // Saving state for the recyclerview.  Position is retained on rotation.
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        mSavedRecyclerLayoutState = lm.onSaveInstanceState();
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mSavedRecyclerLayoutState);
+    }
+
+    // Restoring state for the recyclerview.  Position is retained on rotation.
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mSavedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+        }
     }
 }
