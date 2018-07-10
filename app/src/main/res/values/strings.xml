@@ -20,13 +20,4 @@
     <string name="author">- %1$s</string>
     <string name="removed_favorites">Removed from Favorites</string>
     <string name="added_favorites">Added to Favorites</string>
-
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment1">Hello blank fragment 1</string>
-    <string name="hello_blank_fragment2">Hello blank fragment 2</string>
-    <string name="hello_blank_fragment3">Hello blank fragment 3</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
