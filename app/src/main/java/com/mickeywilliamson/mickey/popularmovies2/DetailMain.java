@@ -26,6 +26,8 @@ import butterknife.OnClick;
  */
 public class DetailMain extends Fragment {
 
+    private static Movie mMovie;
+
     // Binds views to variables.
     @BindView(R.id.tv_title) TextView mTitle;
     @BindView(R.id.tv_image) ImageView mImage;
@@ -52,6 +54,7 @@ public class DetailMain extends Fragment {
     // the click on the movie in the list of movies (MainActivity) to the DetailActivity in the form
     // of an intent.  They are then passed from the detail activity to this fragment in a bundle.
     public static DetailMain newInstance(Movie movie) {
+        mMovie = movie;
         DetailMain fragment = new DetailMain();
         Bundle args = new Bundle();
         args.putString(ARG_ID, movie.getId());
@@ -94,7 +97,8 @@ public class DetailMain extends Fragment {
                 public void onChanged(@Nullable Movie movie) {
                     if (movie != null) {
                         btnFavorite.setText(btnFavorite.getResources().getString(R.string.in_favorites));
-                        btnFavorite.setEnabled(false);
+                    } else {
+                        btnFavorite.setText(btnFavorite.getResources().getString(R.string.button_favorite));
                     }
                 }
             });
@@ -104,26 +108,45 @@ public class DetailMain extends Fragment {
     }
 
     // When the favorite button is clicked, the movie is added to the favorite_movie database
-    // and a Toast is shown confirming the addition.
+    // and a Toast is shown confirming the addition.  If the button is clicked again, the movie
+    // is removed from favorites and a Toast is shown confirming the deletion.
     @OnClick(R.id.btn_favorite)
     public void markFavorite(View view) {
         mDb = AppDatabase.getInstance(getActivity());
+        Button button = (Button) view;
+        final String buttonText = button.getText().toString();
+
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mDb.favoriteMoviesDao().insertFavoriteMovie(
-                    new Movie(
-                            getArguments().getString(ARG_ID),
-                            getArguments().getString(ARG_TITLE),
-                            getArguments().getString(ARG_IMAGE),
-                            getArguments().getString(ARG_PLOT),
-                            getArguments().getString(ARG_RATING),
-                            getArguments().getString(ARG_DATE)
-                    )
-                );
+
+                if (buttonText.equals(getString(R.string.in_favorites))) {
+                    mDb.favoriteMoviesDao().deleteFavoriteMovie(mMovie);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), getString(R.string.removed_favorites), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    mDb.favoriteMoviesDao().insertFavoriteMovie(
+                        new Movie(
+                                getArguments().getString(ARG_ID),
+                                getArguments().getString(ARG_TITLE),
+                                getArguments().getString(ARG_IMAGE),
+                                getArguments().getString(ARG_PLOT),
+                                getArguments().getString(ARG_RATING),
+                                getArguments().getString(ARG_DATE)
+                        )
+                    );
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), getString(R.string.added_favorites), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
-
-        Toast.makeText(getActivity(), "Added to Favorites", Toast.LENGTH_SHORT).show();
     }
 }
